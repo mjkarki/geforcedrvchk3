@@ -1,10 +1,19 @@
 use geforcedrvchk3::{get_available_version_information,
                      get_installed_version,
                      start_browser,
-                     handle_error,
                      ask_confirmation};
 
 const VERSION: &str = "0.1";
+
+fn handle_error<T>(result: Result<T, String>) -> T {
+    match result {
+        Ok(value) => value,
+        Err(value) => {
+            println!("{}", value);
+            std::process::exit(1);
+        },
+    }
+}
 
 fn main() {
     let installed: String = handle_error(get_installed_version());

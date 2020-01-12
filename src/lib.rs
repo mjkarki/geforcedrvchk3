@@ -50,16 +50,6 @@ pub fn start_browser(url: &str) {
     Command::new(env::var("ComSpec").unwrap()).arg("/c").arg("start").arg(url).spawn().unwrap();
 }
 
-pub fn handle_error<T>(result: Result<T, String>) -> T {
-    match result {
-        Ok(value) => value,
-        Err(value) => {
-            println!("{}", value);
-            std::process::exit(1);
-        },
-    }
-}
-
 pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usize {
     let mut input = String::new();
 
