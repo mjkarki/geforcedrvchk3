@@ -87,3 +87,33 @@ pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usiz
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_page_success() {
+        assert_eq!(get_page("http://example.com/").is_ok(), true);
+    }
+
+    #[test]
+    fn get_page_success_ssl() {
+        assert_eq!(get_page("https://example.com/").is_ok(), true);
+    }
+
+    #[test]
+    fn get_page_fail() {
+        assert_eq!(get_page("http://nonexistingdomain.local/").is_err(), true);
+    }
+
+    #[test]
+    fn get_installed_version_test() {
+        assert_eq!(get_installed_version().is_ok(), true);
+    }
+
+    #[test]
+    fn get_available_version_information_test() {
+        assert_eq!(get_available_version_information().is_ok(), true);
+    }
+}
