@@ -125,6 +125,67 @@ pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usiz
     }
 }
 
+/// Displays download progress. Used by dl_file().
+fn progress_meter(total_dl: f64, current_dl: f64, _total_ul: f64, _current_ul: f64) -> bool {
+    let cur = current_dl / 1_000_000.0;
+    let tot = total_dl / 1_000_000.0;
+
+    print!("Downloading: {} / {} MB... \r", cur.round(), tot.round());
+    stdout().flush().unwrap();
+    true
+}
+
+/// Downloads a file from the given URL and stores it using the given file name.
+/// 
+/// On error, returns an error message, if target file cannot be created
+/// or the URL is inaccessible.
+fn dl_file(url: &str, file: &str) -> Result<(), String> {
+    let mut file = std::fs::File::create(file).or(Err("Unable to create a temporary file!"))?;
+    let mut handle = Easy::new();
+
+    handle.progress_function(progress_meter).unwrap();
+    handle.progress(true).unwrap();
+    handle.url(url).unwrap();
+    {
+        let mut transfer = handle.transfer();
+        transfer.write_function(|data| {
+            file.write(data).unwrap();
+            Ok(data.len())
+        }).unwrap();
+        match transfer.perform() {
+            Ok(_) => {
+                println!("Download finished!          ");
+                Ok(())
+            },
+            Err(_) => Err(String::from("Unable to access the online resources!")),
+        }
+    }
+}
+
+/// Downloads the driver executable from the given URL and automatically executes the setup process.
+/// 
+/// Note that this method stores the driver binary to a temporary folder (%TEMP%) and doesn't delete
+/// it after the installation has been completed. Also, the installer tries to automatically restart
+/// the computer at the end of the installation process.
+pub fn auto_install(url: &str) {
+    let temp = format!("{}\\nvidiadrv.exe", env::var("temp").unwrap());
+
+    match dl_file(url, &temp) {
+        Ok(_) => {
+            Command::new(env::var("ComSpec").unwrap())
+                .arg("/c")
+                .arg("start")
+                .arg(&temp)
+                .arg("/passive")
+                .arg("/forcereboot")
+                .arg("Display.Driver")
+                .spawn().unwrap();
+            println!("Installing...");
+        },
+        Err(err) => println!("{}", err),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,9 +1,10 @@
 use geforcedrvchk3::{get_available_version_information,
                      get_installed_version,
                      start_browser,
-                     ask_confirmation};
+                     ask_confirmation,
+                     auto_install};
 
-const VERSION: &str = "0.1";
+const VERSION: &str = "0.2";
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     match result {
@@ -29,8 +30,10 @@ fn main() {
 
     if instd_ver < avail_ver {
         println!("New driver version is available:    {}\n", avail_ver);
-        if ask_confirmation("Do you want to download the latest driver?", &vec!['y', 'n'], 0) == 0 {
-            start_browser(&avail_url);
+        match ask_confirmation("Do you want to (d)ownload the latest driver, (a)utomatically install and reboot or (q)uit?", &vec!['d', 'a', 'q'], 0) {
+            0 => start_browser(&avail_url),
+            1 => auto_install(&avail_url),
+            _ => (),
         }
     }
 }
