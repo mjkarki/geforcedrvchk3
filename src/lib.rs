@@ -88,6 +88,8 @@ pub fn start_browser(url: &str) {
 /// options, then the question is repeated. User can enter several characters
 /// to the input field, but only the first character is counted as a selection.
 /// 
+/// Input is not case-sensitive.
+/// 
 /// Example:
 /// 
 /// ``ask_confirmation("Are you sure?", ['y', 'n'], 1)``
@@ -116,7 +118,7 @@ pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usiz
             break default;
         }
         else {
-            let pos = &options.iter().position(|&x| x == input.chars().next().unwrap());
+            let pos = &options.iter().position(|&x| x.to_lowercase().next() == input.chars().next().unwrap().to_lowercase().next());
             match pos {
                 Some(value) => break *value,
                 None => input.clear(),
