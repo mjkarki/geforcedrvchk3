@@ -30,7 +30,10 @@ fn main() {
 
     if instd_ver < avail_ver {
         println!("New driver version is available:    {}\n", avail_ver);
-        match ask_confirmation("Do you want to (d)ownload the latest driver, (a)utomatically install and reboot or (q)uit?", &vec!['d', 'a', 'q'], 0) {
+        match ask_confirmation("Do you want to:\n  \
+                                (d)ownload the latest driver,\n  \
+                                (a)utomatically install and reboot or\n  \
+                                (q)uit?", &vec!['d', 'a', 'q'], 0) {
             0 => start_browser(&avail_url),
             1 => auto_install(&avail_url),
             _ => (),
