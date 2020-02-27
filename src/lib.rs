@@ -66,7 +66,10 @@ pub fn get_available_version_information() -> Result<(String, String), String> {
 /// found), then an error message is provided as a result.
 pub fn get_installed_version() -> Result<String, String> {
     let nvidiasmi = format!("{}\\{}", env::var("ProgramFiles").unwrap(), NVIDIA_SMI_PATH);
-    let output = Command::new(nvidiasmi).output().or(Err("Cannot execute nvidia-smi.exe!"))?;
+    let output = match Command::new(nvidiasmi).output() {
+        Ok(value) => value,
+        Err(_) => return Ok(String::from("0")),
+    };
     let pattern = Regex::new(r"Driver Version: ([0-9]+\.[0-9]+)").unwrap();
     let nvsmi = String::from_utf8_lossy(&output.stdout);
     let captures = pattern.captures(&nvsmi).ok_or("Cannot find installed version information!")?;

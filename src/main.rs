@@ -4,7 +4,7 @@ use geforcedrvchk3::{get_available_version_information,
                      ask_confirmation,
                      auto_install};
 
-const VERSION: &str = "0.2";
+const VERSION: &str = "0.3";
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     match result {
@@ -26,7 +26,12 @@ fn main() {
 
     println!("NVIDIA GeForce Driver Check v{}\n", VERSION);
 
-    println!("Currently installed driver version: {}", instd_ver);
+    if instd_ver > 0.0 {
+        println!("Currently installed driver version: {}", instd_ver);
+    }
+    else {
+        println!("Couldn't detect installed version. Maybe the driver is not installed?");
+    }
 
     if instd_ver < avail_ver {
         println!("New driver version is available:    {}\n", avail_ver);
