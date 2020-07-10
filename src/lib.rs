@@ -66,10 +66,7 @@ pub fn get_available_version_information() -> Result<(String, String), String> {
 /// found), then an error message is provided as a result.
 pub fn get_installed_version() -> Result<String, String> {
     let nvidiasmi = format!("{}\\{}", env::var("ProgramFiles").unwrap(), NVIDIA_SMI_PATH);
-    let output = match Command::new(nvidiasmi).output() {
-        Ok(value) => value,
-        Err(_) => return Ok(String::from("0")),
-    };
+    let output = Command::new(nvidiasmi).output().or(Err("Couldn't detect installed version. Maybe the driver is not installed?"))?;
     let pattern = Regex::new(r"Driver Version: ([0-9]+\.[0-9]+)").unwrap();
     let nvsmi = String::from_utf8_lossy(&output.stdout);
     let captures = pattern.captures(&nvsmi).ok_or("Cannot find installed version information!")?;
@@ -177,13 +174,13 @@ pub fn auto_install(url: &str) {
 
     match dl_file(url, &temp) {
         Ok(_) => {
-            Command::new(env::var("ComSpec").unwrap())
-                .arg("/c")
-                .arg("start")
-                .arg(&temp)
-                .arg("/passive")
-                .arg("/forcereboot")
-                .arg("Display.Driver")
+            Command::new(env::var("ComSpec").unwrap())  // Get cmd.exe with full path
+                .arg("/c")                              // Execute command and exit
+                .arg("start")                           // Calling start ensures that we don't have an empty shell window hanging, when the setup is running
+                .arg(&temp)                             // Name of the setup executable we just downloaded
+                .arg("/passive")                        // Don't require user interaction while installing
+                .arg("/forcereboot")                    // We have to reboot after the installation to ensure that all settings will be correct
+                .arg("Display.Driver")                  // Name of the module we want to install from the driver package
                 .spawn().unwrap();
             println!("Installing...");
         },
@@ -215,6 +212,9 @@ mod tests {
         assert_eq!(get_installed_version().is_ok(), true);
     }
 
+    // This test case assumes that there is a working network connection and
+    // the GeForce web site is available with correct information. Not very
+    // reliable, but I have nothing better for this...
     #[test]
     fn get_available_version_information_test() {
         assert_eq!(get_available_version_information().is_ok(), true);

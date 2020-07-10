@@ -26,12 +26,7 @@ fn main() {
 
     println!("Display Driver Check version {}\n", VERSION);
 
-    if instd_ver > 0.0 {
-        println!("Currently installed driver version: {}", instd_ver);
-    }
-    else {
-        println!("Couldn't detect installed version. Maybe the driver is not installed?");
-    }
+    println!("Currently installed driver version: {}", instd_ver);
 
     if instd_ver < avail_ver {
         println!("New driver version is available:    {}\n", avail_ver);
