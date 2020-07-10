@@ -24,7 +24,7 @@ fn main() {
     let avail_ver: f64 = handle_error(available.0.parse().or(Err(String::from("Cannot convert available version number!"))));
     let avail_url: String = available.1;
 
-    println!("NVIDIA GeForce Driver Check v{}\n", VERSION);
+    println!("Display Driver Check version {}\n", VERSION);
 
     if instd_ver > 0.0 {
         println!("Currently installed driver version: {}", instd_ver);
