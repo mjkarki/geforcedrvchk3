@@ -31,7 +31,7 @@ Possible future goals:
 1. go to the project folder and run: `cargo build --release`
 1. fetch compiled binary from the target\release folder
 
-Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](https://github.com/mjkarki/geforcedrvchk3/releases/download/v0.3/geforcedrvchk3.exe) (at [github.com](https://github.com/mjkarki/geforcedrvchk3/releases))
+Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](https://github.com/mjkarki/geforcedrvchk3/releases/download/v0.3.1/geforcedrvchk3.exe) (at [github.com](https://github.com/mjkarki/geforcedrvchk3/releases))
 
 ### Installing
 
@@ -41,7 +41,7 @@ Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](http
 
 ### Attention
 
-Version 0.2 has a new experimental feature: automatic driver download and installation. By default geforcedrvchk3 still uses the web browser to download the driver (started by pressing ENTER or by selecting 'D' from the options). The new addition is the option 'A', which tries to download the driver file to the %TEMP% and execute it with options, which only performs the Display.Driver module installation and automatic restarting. This feature is somewhat undocumented and may result in unexpected behavior (and that's the reason for the forced reboot). The feature seems to work fine, if there already is an existing driver installation with working configuration at the system.
+Version 0.2 (and later versions) has a new experimental feature: automatic driver download and installation. By default geforcedrvchk3 still uses the web browser to download the driver (started by pressing ENTER or by selecting 'D' from the options). The new addition is the option 'A', which tries to download the driver file to the %TEMP% and execute it with options, which only performs the Display.Driver module installation and automatic restarting. This feature is somewhat undocumented and may result in unexpected behavior (and that's the reason for the forced reboot). The feature seems to work fine, if there already is an existing driver installation with working configuration at the system.
 
 If you use the automatic installation option, please ensure that all other programs are closed before starting!
 

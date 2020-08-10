@@ -3,14 +3,20 @@ use geforcedrvchk3::{get_available_version_information,
                      start_browser,
                      ask_confirmation,
                      auto_install};
+use std::io::{stdin, stdout, Write};
 
-const VERSION: &str = "0.3";
+const VERSION: &str = "0.3.1";
 
 fn handle_error<T>(result: Result<T, String>) -> T {
+    let mut input = String::new();
+
     match result {
         Ok(value) => value,
         Err(value) => {
             println!("{}", value);
+            print!("\nPress Enter...");
+            stdout().flush().unwrap();
+            stdin().read_line(&mut input).unwrap();
             std::process::exit(1);
         },
     }
