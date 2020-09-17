@@ -5,7 +5,7 @@ use geforcedrvchk3::{get_available_version_information,
                      auto_install};
 use std::io::{stdin, stdout, Write};
 
-const VERSION: &str = "0.3.1";
+const VERSION: &str = "0.3.2";
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     let mut input = String::new();
