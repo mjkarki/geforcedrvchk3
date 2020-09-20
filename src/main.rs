@@ -5,7 +5,7 @@ use geforcedrvchk3::{get_available_version_information,
                      auto_install};
 use std::io::{stdin, stdout, Write};
 
-const VERSION: &str = "0.3.2";
+const VERSION: &str = "0.4";
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     let mut input = String::new();
@@ -26,8 +26,8 @@ fn main() {
     let installed: String = handle_error(get_installed_version());
     let available: (String, String) = handle_error(get_available_version_information());
 
-    let instd_ver: f64 = handle_error(installed.parse().or(Err(String::from("Cannot convert installed version number!"))));
-    let avail_ver: f64 = handle_error(available.0.parse().or(Err(String::from("Cannot convert available version number!"))));
+    let instd_ver: f64 = handle_error(installed.parse().or(Err("Cannot convert installed version number!".to_string())));
+    let avail_ver: f64 = handle_error(available.0.parse().or(Err("Cannot convert available version number!".to_string())));
     let avail_url: String = available.1;
 
     println!("Display Driver Check version {}\n", VERSION);

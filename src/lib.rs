@@ -10,6 +10,7 @@
 //! <https://www.geforce.com/drivers>
 
 use std::env;
+use std::path::Path;
 use std::process::Command;
 use regex::Regex;
 use curl::easy::Easy;
@@ -17,7 +18,8 @@ use json;
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
 
-const NVIDIA_SMI_PATH: &str = r"NVIDIA Corporation\NVSMI\nvidia-smi.exe";
+const NVIDIA_SMI_PATH_OLD: &str = r"NVIDIA Corporation\NVSMI\nvidia-smi.exe";
+const NVIDIA_SMI_PATH_NEW: &str = r"System32\nvidia-smi.exe";
 const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=101&pfid=859&osID=57&languageCode=1033&beta=0&isWHQL=0&dltype=-1&dch=1&upCRD=0&qnf=0&sort1=0&numberOfResults=10";
 
 /// Fetches contents of the URL and returns them as a string. It is assumed
@@ -55,7 +57,7 @@ pub fn get_available_version_information() -> Result<(String, String), String> {
     let json_url = &data["IDS"][0]["downloadInfo"]["DownloadURL"];
     let version = json_version.as_str().ok_or("Cannot find version information from the online resource!")?;
     let url = json_url.as_str().ok_or("Cannot find download URL information from the online resource!")?;
-    Ok((String::from(version), String::from(url)))
+    Ok((version.to_string(), url.to_string()))
 }
 
 /// Retrieves installed display driver version as a string. The version number
@@ -65,12 +67,29 @@ pub fn get_available_version_information() -> Result<(String, String), String> {
 /// If the version number is not available (e.g. nvidia-smi.exe could not be
 /// found), then an error message is provided as a result.
 pub fn get_installed_version() -> Result<String, String> {
-    let nvidiasmi = format!("{}\\{}", env::var("ProgramFiles").unwrap(), NVIDIA_SMI_PATH);
+    let nvidiasmi = get_nvidia_smi_location()?;
     let output = Command::new(nvidiasmi).output().or(Err("Couldn't detect installed version. Maybe the driver is not installed?"))?;
     let pattern = Regex::new(r"Driver Version: ([0-9]+\.[0-9]+)").unwrap();
     let nvsmi = String::from_utf8_lossy(&output.stdout);
     let captures = pattern.captures(&nvsmi).ok_or("Cannot find installed version information!")?;
     Ok(String::from(&captures[1]))
+}
+
+/// Find nvidia-smi.exe and return full path.
+fn get_nvidia_smi_location() -> Result<String, String> {
+    let nvidiasmi = format!("{}\\{}", env::var("windir").unwrap(), NVIDIA_SMI_PATH_NEW);
+    if Path::new(&nvidiasmi).exists() == false {
+        let nvidiasmi = format!("{}\\{}", env::var("ProgramFiles").unwrap(), NVIDIA_SMI_PATH_OLD);
+        if Path::new(&nvidiasmi).exists() == false {
+            Err("Couldn't detect location for nvidia-smi. Maybe the driver is not installed?".to_string())
+        }
+        else {
+            Ok(nvidiasmi)
+        }
+    }
+    else {
+        Ok(nvidiasmi)
+    }
 }
 
 /// Starts the default web browser if a valid URL is given. Note that the
@@ -159,7 +178,7 @@ fn dl_file(url: &str, file: &str) -> Result<(), String> {
                 println!("Download finished!          ");
                 Ok(())
             },
-            Err(_) => Err(String::from("Unable to access the online resources!")),
+            Err(_) => Err("Unable to access the online resources!".to_string()),
         }
     }
 }
@@ -198,7 +217,7 @@ mod tests {
     }
 
     #[test]
-    fn get_page_success_ssl() {
+    fn get_page_ssl_success() {
         assert_eq!(get_page("https://example.com/").is_ok(), true);
     }
 
@@ -208,7 +227,7 @@ mod tests {
     }
 
     #[test]
-    fn get_installed_version_test() {
+    fn get_installed_version_success() {
         assert_eq!(get_installed_version().is_ok(), true);
     }
 
@@ -216,7 +235,7 @@ mod tests {
     // the GeForce web site is available with correct information. Not very
     // reliable, but I have nothing better for this...
     #[test]
-    fn get_available_version_information_test() {
+    fn get_available_version_information_success() {
         assert_eq!(get_available_version_information().is_ok(), true);
     }
 }
