@@ -18,6 +18,8 @@ use json;
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
 
+pub const VERSION: &str = "0.4.1";
+
 const NVIDIA_SMI_PATH_OLD: &str = r"NVIDIA Corporation\NVSMI\nvidia-smi.exe";
 const NVIDIA_SMI_PATH_NEW: &str = r"System32\nvidia-smi.exe";
 const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=101&pfid=859&osID=57&languageCode=1033&beta=0&isWHQL=0&dltype=-1&dch=1&upCRD=0&qnf=0&sort1=0&numberOfResults=10";
@@ -26,7 +28,7 @@ const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/c
 /// that the contents are UTF-8 encoded.
 /// 
 /// If there is an error, then an error message is returned as a result.
-fn get_page(url: &str) -> Result<String, String> {
+pub fn get_page(url: &str) -> Result<String, String> {
     let mut handle = Easy::new();
     let mut result_vector: Vec<u8> = Vec::new();
     
@@ -48,9 +50,12 @@ fn get_page(url: &str) -> Result<String, String> {
 /// and a download URL as a tuple. The version number should be formatted as
 /// "XXX.YY", so it should be possible to convert it to a double.
 /// 
+/// Takes as an argument a function that is able to retrieve data from the server and
+/// return is as a string (JSON). Just use get_page() here.
+/// 
 /// If the information cannot be retrieved, then an error message is provided
 /// as a result.
-pub fn get_available_version_information() -> Result<(String, String), String> {
+pub fn get_available_version_information(get_page: fn (&str) -> Result<String, String>) -> Result<(String, String), String> {
     let page = get_page(NVIDIA_URL)?;
     let data = json::parse(&page).or(Err("Incorrect information at the online resource!"))?;
     let json_version = &data["IDS"][0]["downloadInfo"]["Version"];
@@ -211,31 +216,52 @@ pub fn auto_install(url: &str) {
 mod tests {
     use super::*;
 
+    /// Test that get_page() is able to fetch a web page via http connection.
     #[test]
     fn get_page_success() {
         assert_eq!(get_page("http://example.com/").is_ok(), true);
     }
 
+    /// Test that get_page() is able to fetch a web page via https connection.
     #[test]
     fn get_page_ssl_success() {
         assert_eq!(get_page("https://example.com/").is_ok(), true);
     }
 
+    /// Test that get_page() handles non-existent URL correctly.
     #[test]
     fn get_page_fail() {
         assert_eq!(get_page("http://nonexistingdomain.local/").is_err(), true);
     }
 
+    /// Test that fetching installed driver version works.
+    /// This test requires that display drivers are installed.
     #[test]
     fn get_installed_version_success() {
         assert_eq!(get_installed_version().is_ok(), true);
     }
 
-    // This test case assumes that there is a working network connection and
-    // the GeForce web site is available with correct information. Not very
-    // reliable, but I have nothing better for this...
+    /// Test that fetching available driver data works.
     #[test]
     fn get_available_version_information_success() {
-        assert_eq!(get_available_version_information().is_ok(), true);
+        assert_eq!(get_available_version_information(get_test_page).is_ok(), true);
+    }
+
+    /// Test that fetching available driver version works.
+    #[test]
+    fn get_available_version_number_success() {
+        assert_eq!(get_available_version_information(get_test_page).unwrap().0, "123.45");
+    }
+
+    /// Test that fetching available driver URL works.
+    #[test]
+    fn get_available_version_url_success() {
+        assert_eq!(get_available_version_information(get_test_page).unwrap().1, "https://example.com/test.exe");
+    }
+
+    /// Stub function for unit tests. Imitates get_page() function.
+    fn get_test_page(_url: &str) -> Result<String, String> {
+        let json = r#"{ "Success" : "1", "IDS" : [ { "downloadInfo": { "Version" : "123.45", "DownloadURL" : "https://example.com/test.exe" } } ] }"#;
+        Ok(json.to_string())
     }
 }

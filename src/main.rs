@@ -1,11 +1,11 @@
 use geforcedrvchk3::{get_available_version_information,
+                     get_page,
                      get_installed_version,
                      start_browser,
                      ask_confirmation,
-                     auto_install};
+                     auto_install,
+                     VERSION};
 use std::io::{stdin, stdout, Write};
-
-const VERSION: &str = "0.4";
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     let mut input = String::new();
@@ -24,7 +24,7 @@ fn handle_error<T>(result: Result<T, String>) -> T {
 
 fn main() {
     let installed: String = handle_error(get_installed_version());
-    let available: (String, String) = handle_error(get_available_version_information());
+    let available: (String, String) = handle_error(get_available_version_information(get_page));
 
     let instd_ver: f64 = handle_error(installed.parse().or(Err("Cannot convert installed version number!".to_string())));
     let avail_ver: f64 = handle_error(available.0.parse().or(Err("Cannot convert available version number!".to_string())));
