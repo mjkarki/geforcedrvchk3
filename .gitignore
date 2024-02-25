@@ -1,2 +1,4 @@
+/.ctags.d
+tags
 /target
 **/*.rs.bk

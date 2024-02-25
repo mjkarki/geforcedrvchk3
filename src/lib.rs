@@ -18,7 +18,7 @@ use json;
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
 
-pub const VERSION: &str = "0.4.1";
+pub const VERSION: &str = "0.4.2";
 
 const NVIDIA_SMI_PATH_OLD: &str = r"NVIDIA Corporation\NVSMI\nvidia-smi.exe";
 const NVIDIA_SMI_PATH_NEW: &str = r"System32\nvidia-smi.exe";
