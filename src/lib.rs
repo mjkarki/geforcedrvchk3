@@ -195,9 +195,8 @@ fn dl_file(url: &str, file: &str) -> Result<(), String> {
 
 /// Downloads the driver executable from the given URL and automatically executes the setup process.
 ///
-/// Note that this method stores the driver binary to a temporary folder (%TEMP%) and doesn't delete
-/// it after the installation has been completed. Also, the installer tries to automatically restart
-/// the computer at the end of the installation process.
+/// Note that this method stores the driver binary to a temporary folder (%TEMP%) and tries to delete
+/// it at the end of the installation process.
 pub fn auto_install(url: &str) {
     let temp = format!("{}/nvidiadrv.exe", env::var("temp").expect("Environment variable 'temp' not found!"));
 
