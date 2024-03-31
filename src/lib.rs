@@ -198,14 +198,17 @@ fn dl_file(url: &str, file: &str) -> Result<(), String> {
 /// Note that this method stores the driver binary to a temporary folder (%TEMP%) and tries to delete
 /// it at the end of the installation process.
 pub fn auto_install(url: &str) {
-    let temp = format!("{}/nvidiadrv.exe", env::var("temp").expect("Environment variable 'temp' not found!"));
+    let mut temp = PathBuf::new();
+    temp.push(env::var("temp").expect("Environment variable 'temp' not found!"));
+    temp.push("nvidiadrv.exe");
+    let temp_str = temp.to_str().expect("Invalid path!");
 
-    match dl_file(url, &temp) {
+    match dl_file(url, temp_str) {
         Ok(_) => {
             println!("Installing...");
-            Command::new(&temp).status().unwrap();
+            Command::new(temp_str).status().unwrap();
             println!("Deleting temporary file...");
-            std::fs::remove_file(&temp).unwrap();
+            std::fs::remove_file(temp_str).unwrap();
             println!("Done.");
         },
         Err(err) => println!("{err}"),
