@@ -6,6 +6,7 @@ use geforcedrvchk3::{get_available_version_information,
                      auto_install,
                      VERSION};
 use std::io::{stdin, stdout, Write};
+use curl::Version;
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     let mut input = String::new();
@@ -13,7 +14,7 @@ fn handle_error<T>(result: Result<T, String>) -> T {
     match result {
         Ok(value) => value,
         Err(value) => {
-            println!("{}", value);
+            println!("{value}");
             print!("\nPress Enter...");
             stdout().flush().unwrap();
             stdin().read_line(&mut input).unwrap();
@@ -23,6 +24,9 @@ fn handle_error<T>(result: Result<T, String>) -> T {
 }
 
 fn main() {
+    println!("Display Driver Check version {VERSION}");
+    println!("{}\n", Version::num());
+
     let installed: String = handle_error(get_installed_version());
     let available: (String, String) = handle_error(get_available_version_information(get_page));
 
@@ -30,12 +34,10 @@ fn main() {
     let avail_ver: f64 = handle_error(available.0.parse().or(Err("Cannot convert available version number!".to_string())));
     let avail_url: String = available.1;
 
-    println!("Display Driver Check version {}\n", VERSION);
-
-    println!("Currently installed driver version: {}", instd_ver);
+    println!("Currently installed driver version: {instd_ver}");
 
     if instd_ver < avail_ver {
-        println!("New driver version is available:    {}\n", avail_ver);
+        println!("New driver version is available:    {avail_ver}\n");
         match ask_confirmation("Do you want to:\n  \
                                 (d)ownload the latest driver,\n  \
                                 (a)utomatically install and reboot or\n  \

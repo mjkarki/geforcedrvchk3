@@ -1,11 +1,11 @@
 //! This library provides tools for querying NVIDIA GeForce graphics driver
 //! version information from the installed driver and from the driver
 //! download page.
-//! 
+//!
 //! The library fetches information for GTX 1070 Ti card for 64-bit Windows
 //! operating system. The driver should be the same for other modern NVIDIA
 //! cards.
-//! 
+//!
 //! The page this library is using for fetching information is this:
 //! <https://www.geforce.com/drivers>
 
@@ -26,12 +26,11 @@ const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/c
 
 /// Fetches contents of the URL and returns them as a string. It is assumed
 /// that the contents are UTF-8 encoded.
-/// 
+///
 /// If there is an error, then an error message is returned as a result.
 pub fn get_page(url: &str) -> Result<String, String> {
     let mut handle = Easy::new();
     let mut result_vector: Vec<u8> = Vec::new();
-    
     handle.url(url).unwrap();
     {
         let mut transfer = handle.transfer();
@@ -49,10 +48,10 @@ pub fn get_page(url: &str) -> Result<String, String> {
 /// Retrieves the latest available driver installation package version number
 /// and a download URL as a tuple. The version number should be formatted as
 /// "XXX.YY", so it should be possible to convert it to a double.
-/// 
+///
 /// Takes as an argument a function that is able to retrieve data from the server and
 /// return is as a string (JSON). Just use get_page() here.
-/// 
+///
 /// If the information cannot be retrieved, then an error message is provided
 /// as a result.
 pub fn get_available_version_information(get_page: fn (&str) -> Result<String, String>) -> Result<(String, String), String> {
@@ -68,7 +67,7 @@ pub fn get_available_version_information(get_page: fn (&str) -> Result<String, S
 /// Retrieves installed display driver version as a string. The version number
 /// should be formatted as "XXX.YY", so it should be possible to convert it to
 /// a double.
-/// 
+///
 /// If the version number is not available (e.g. nvidia-smi.exe could not be
 /// found), then an error message is provided as a result.
 pub fn get_installed_version() -> Result<String, String> {
@@ -99,7 +98,7 @@ fn get_nvidia_smi_location() -> Result<String, String> {
 
 /// Starts the default web browser if a valid URL is given. Note that the
 /// operation is executed simply by calling "start" command at the
-/// commmand-line and the URL is not sanitized in any way. It's possible to run
+/// command-line and the URL is not sanitized in any way. It's possible to run
 /// arbitrary commands with this function.
 pub fn start_browser(url: &str) {
     Command::new(env::var("ComSpec").unwrap()).arg("/c").arg("start").arg(url).spawn().unwrap();
@@ -111,17 +110,17 @@ pub fn start_browser(url: &str) {
 /// selecting any choice. If user selects an option, which is not listed in
 /// options, then the question is repeated. User can enter several characters
 /// to the input field, but only the first character is counted as a selection.
-/// 
+///
 /// Input is not case-sensitive.
-/// 
+///
 /// Example:
-/// 
+///
 /// ``ask_confirmation("Are you sure?", ['y', 'n'], 1)``
-/// 
+///
 /// Displays:
-/// 
+///
 /// ``Are you sure? (y,n)[n]``
-/// 
+///
 /// The return value is the index of the selection based on the options list.
 pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usize {
     let mut input = String::new();
@@ -137,7 +136,6 @@ pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usiz
         print!(")[{}] ", options[default]);
         stdout().flush().unwrap();
         stdin().read_line(&mut input).unwrap();
-    
         if input.trim().len() == 0 {
             break default;
         }
@@ -162,7 +160,7 @@ fn progress_meter(total_dl: f64, current_dl: f64, _total_ul: f64, _current_ul: f
 }
 
 /// Downloads a file from the given URL and stores it using the given file name.
-/// 
+///
 /// On error, returns an error message, if target file cannot be created
 /// or the URL is inaccessible.
 fn dl_file(url: &str, file: &str) -> Result<(), String> {
@@ -189,7 +187,7 @@ fn dl_file(url: &str, file: &str) -> Result<(), String> {
 }
 
 /// Downloads the driver executable from the given URL and automatically executes the setup process.
-/// 
+///
 /// Note that this method stores the driver binary to a temporary folder (%TEMP%) and doesn't delete
 /// it after the installation has been completed. Also, the installer tries to automatically restart
 /// the computer at the end of the installation process.
