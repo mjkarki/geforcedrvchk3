@@ -17,11 +17,10 @@ use curl::easy::Easy;
 use json;
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
+use std::path::PathBuf;
 
-pub const VERSION: &str = "0.4.2";
+pub const VERSION: &str = "0.5.0";
 
-const NVIDIA_SMI_PATH_OLD: &str = r"NVIDIA Corporation\NVSMI\nvidia-smi.exe";
-const NVIDIA_SMI_PATH_NEW: &str = r"System32\nvidia-smi.exe";
 const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=101&pfid=859&osID=57&languageCode=1033&beta=0&isWHQL=0&dltype=-1&dch=1&upCRD=0&qnf=0&sort1=0&numberOfResults=10";
 
 /// Fetches contents of the URL and returns them as a string. It is assumed
@@ -31,6 +30,7 @@ const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/c
 pub fn get_page(url: &str) -> Result<String, String> {
     let mut handle = Easy::new();
     let mut result_vector: Vec<u8> = Vec::new();
+
     handle.url(url).unwrap();
     {
         let mut transfer = handle.transfer();
@@ -81,18 +81,24 @@ pub fn get_installed_version() -> Result<String, String> {
 
 /// Find nvidia-smi.exe and return full path.
 fn get_nvidia_smi_location() -> Result<String, String> {
-    let nvidiasmi = format!("{}\\{}", env::var("windir").unwrap(), NVIDIA_SMI_PATH_NEW);
+    let nvidia_smi_path_old: PathBuf = ["NVIDIA Corporation", "NVSMI", "nvidia-smi.exe"].iter().collect();
+    let nvidia_smi_path_new: PathBuf = ["System32", "nvidia-smi.exe"].iter().collect();
+    let mut nvidiasmi = PathBuf::new();
+    nvidiasmi.push(env::var("windir").expect("Environment variable 'windir' not found!"));
+    nvidiasmi.extend(&nvidia_smi_path_new);
     if Path::new(&nvidiasmi).exists() == false {
-        let nvidiasmi = format!("{}\\{}", env::var("ProgramFiles").unwrap(), NVIDIA_SMI_PATH_OLD);
-        if Path::new(&nvidiasmi).exists() == false {
+        let mut nvidiasmi = PathBuf::new();
+        nvidiasmi.push(env::var("ProgramFiles").expect("Environment variable 'ProgramFiles' not found!"));
+        nvidiasmi.extend(&nvidia_smi_path_old);
+        if nvidiasmi.exists() == false {
             Err("Couldn't detect location for nvidia-smi. Maybe the driver is not installed?".to_string())
         }
         else {
-            Ok(nvidiasmi)
+            Ok(String::from(nvidiasmi.to_string_lossy()))
         }
     }
     else {
-        Ok(nvidiasmi)
+        Ok(String::from(nvidiasmi.to_string_lossy()))
     }
 }
 
@@ -101,7 +107,7 @@ fn get_nvidia_smi_location() -> Result<String, String> {
 /// command-line and the URL is not sanitized in any way. It's possible to run
 /// arbitrary commands with this function.
 pub fn start_browser(url: &str) {
-    Command::new(env::var("ComSpec").unwrap()).arg("/c").arg("start").arg(url).spawn().unwrap();
+    Command::new(env::var("ComSpec").expect("Environment variable 'ComSpec' not found!")).arg("/c").arg("start").arg(url).spawn().unwrap();
 }
 
 /// Asks message from user and lists options. The default option is zero-based
@@ -126,9 +132,9 @@ pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usiz
     let mut input = String::new();
 
     loop {
-        print!("{} (", message);
+        print!("{message} (");
         for option in options {
-            print!("{}", option);
+            print!("{option}");
             if Some(option) != options.last() {
                 print!(",");
             }
@@ -136,6 +142,7 @@ pub fn ask_confirmation(message: &str, options: &[char], default: usize) -> usiz
         print!(")[{}] ", options[default]);
         stdout().flush().unwrap();
         stdin().read_line(&mut input).unwrap();
+
         if input.trim().len() == 0 {
             break default;
         }
@@ -164,7 +171,7 @@ fn progress_meter(total_dl: f64, current_dl: f64, _total_ul: f64, _current_ul: f
 /// On error, returns an error message, if target file cannot be created
 /// or the URL is inaccessible.
 fn dl_file(url: &str, file: &str) -> Result<(), String> {
-    let mut file = std::fs::File::create(file).or(Err("Unable to create a temporary file!"))?;
+    let mut file = std::fs::File::create(file).or(Err("Unable to create file {file}!"))?;
     let mut handle = Easy::new();
 
     handle.progress_function(progress_meter).unwrap();
@@ -192,21 +199,17 @@ fn dl_file(url: &str, file: &str) -> Result<(), String> {
 /// it after the installation has been completed. Also, the installer tries to automatically restart
 /// the computer at the end of the installation process.
 pub fn auto_install(url: &str) {
-    let temp = format!("{}\\nvidiadrv.exe", env::var("temp").unwrap());
+    let temp = format!("{}/nvidiadrv.exe", env::var("temp").expect("Environment variable 'temp' not found!"));
 
     match dl_file(url, &temp) {
         Ok(_) => {
-            Command::new(env::var("ComSpec").unwrap())  // Get cmd.exe with full path
-                .arg("/c")                              // Execute command and exit
-                .arg("start")                           // Calling start ensures that we don't have an empty shell window hanging, when the setup is running
-                .arg(&temp)                             // Name of the setup executable we just downloaded
-                .arg("/passive")                        // Don't require user interaction while installing
-                .arg("/forcereboot")                    // We have to reboot after the installation to ensure that all settings will be correct
-                .arg("Display.Driver")                  // Name of the module we want to install from the driver package
-                .spawn().unwrap();
             println!("Installing...");
+            Command::new(&temp).status().unwrap();
+            println!("Deleting temporary file...");
+            std::fs::remove_file(&temp).unwrap();
+            println!("Done.");
         },
-        Err(err) => println!("{}", err),
+        Err(err) => println!("{err}"),
     }
 }
 

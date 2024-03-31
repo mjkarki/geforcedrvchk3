@@ -1,13 +1,13 @@
 [package]
 name = "geforcedrvchk3"
-version = "0.4.2"
+version = "0.5.0"
 license = "BSD 3-Clause"
 authors = ["Matti J. Karki <mjk@iki.fi>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-curl = "0.4.34"
+curl = "0.4.46"
 json = "0.12.4"
-regex = "1.4.2"
+regex = "1.10.4"
