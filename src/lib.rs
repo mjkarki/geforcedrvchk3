@@ -242,7 +242,7 @@ mod tests {
     fn get_installed_version_success() {
         std::env::set_var("windir", ".");
         std::env::set_var("ProgramFiles", ".");
-        assert_eq!(get_installed_version("smi-stub.bat").is_ok(), true);
+        assert_eq!(get_installed_version("smi-stub.bat").unwrap(), "123.45");
     }
 
     /// Test that fetching available driver data works.
