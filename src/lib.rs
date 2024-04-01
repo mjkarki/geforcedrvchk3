@@ -17,7 +17,7 @@ use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
 
 pub const VERSION: &str = "0.5.0";
-
+pub const SMI: &str = r"nvidia-smi.exe";
 const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=101&pfid=859&osID=57&languageCode=1033&beta=0&isWHQL=0&dltype=-1&dch=1&upCRD=0&qnf=0&sort1=0&numberOfResults=10";
 
 /// Fetches contents of the URL and returns them as a string. It is assumed
@@ -67,8 +67,8 @@ pub fn get_available_version_information(get_page: fn (&str) -> Result<String, S
 ///
 /// If the version number is not available (e.g. nvidia-smi.exe could not be
 /// found), then an error message is provided as a result.
-pub fn get_installed_version() -> Result<String, String> {
-    let nvidiasmi = get_nvidia_smi_location()?;
+pub fn get_installed_version(executable_name: &str) -> Result<String, String> {
+    let nvidiasmi = get_nvidia_smi_location(&executable_name)?;
     let output = Command::new(nvidiasmi).output().or(Err("Couldn't detect installed version. Maybe the driver is not installed?"))?;
     let pattern = Regex::new(r"Driver Version: ([0-9]+\.[0-9]+)").unwrap();
     let nvsmi = String::from_utf8_lossy(&output.stdout);
@@ -77,9 +77,9 @@ pub fn get_installed_version() -> Result<String, String> {
 }
 
 /// Find nvidia-smi.exe and return full path.
-fn get_nvidia_smi_location() -> Result<String, String> {
-    let nvidia_smi_path_old: PathBuf = ["NVIDIA Corporation", "NVSMI", "nvidia-smi.exe"].iter().collect();
-    let nvidia_smi_path_new: PathBuf = ["System32", "nvidia-smi.exe"].iter().collect();
+fn get_nvidia_smi_location(executable_name: &str) -> Result<String, String> {
+    let nvidia_smi_path_old: PathBuf = ["NVIDIA Corporation", "NVSMI", &executable_name].iter().collect();
+    let nvidia_smi_path_new: PathBuf = ["System32", &executable_name].iter().collect();
     let mut nvidiasmi = PathBuf::new();
     nvidiasmi.push(env::var("windir").expect("Environment variable 'windir' not found!"));
     nvidiasmi.extend(&nvidia_smi_path_new);
@@ -240,7 +240,9 @@ mod tests {
     /// This test requires that display drivers are installed.
     #[test]
     fn get_installed_version_success() {
-        assert_eq!(get_installed_version().is_ok(), true);
+        std::env::set_var("windir", ".");
+        std::env::set_var("ProgramFiles", ".");
+        assert_eq!(get_installed_version("smi-stub.bat").is_ok(), true);
     }
 
     /// Test that fetching available driver data works.
