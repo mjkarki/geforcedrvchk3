@@ -9,15 +9,12 @@
 //! The page this library is using for fetching information is this:
 //! <https://www.geforce.com/drivers>
 
-use std::env;
-use std::path::Path;
-use std::process::Command;
+use std::{env, path::Path, path::PathBuf, process::Command};
 use regex::Regex;
 use curl::easy::Easy;
 use json;
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
-use std::path::PathBuf;
 
 pub const VERSION: &str = "0.5.0";
 
