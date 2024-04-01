@@ -205,8 +205,10 @@ pub fn auto_install(url: &str) {
             println!("Installing...");
             Command::new(temp_str).status().unwrap();
             println!("Deleting temporary file...");
-            std::fs::remove_file(temp_str).unwrap();
-            println!("Done.");
+            match std::fs::remove_file(temp_str) {
+                Ok(_) => println!("Done."),
+                Err(_) => println!("Wasn't able to delete temporary file {temp_str}!"),
+            }
         },
         Err(err) => println!("{err}"),
     }
