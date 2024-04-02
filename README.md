@@ -15,7 +15,7 @@ So far, the following goals have been implemented:
 - fetching a page from a WWW server over SSL
 - fetching information from json data
 - compiling single statically linked binary without any dependencies
-- optional automatic downloading and installation
+- ~~optional automatic downloading and installation~~
 - unit tests
 
 Possible future goals:
