@@ -3,7 +3,6 @@ use geforcedrvchk3::{get_available_version_information,
                      get_installed_version,
                      start_browser,
                      ask_confirmation,
-                     auto_install,
                      VERSION,
                      SMI};
 use std::io::{stdin, stdout, Write};
@@ -37,14 +36,12 @@ fn main() {
 
     println!("Currently installed driver version: {instd_ver}");
 
-    if instd_ver < avail_ver {
+    if instd_ver == avail_ver {
         println!("New driver version is available:    {avail_ver}\n");
-        match ask_confirmation("Do you want to:\n  \
-                                (d)ownload the latest driver,\n  \
-                                (a)utomatically download and start the installation\n  \
-                                (q)uit?", &vec!['d', 'a', 'q'], 0) {
+        match ask_confirmation("Do you want to \
+                                (d)ownload the latest driver, or \
+                                (q)uit?", &vec!['d', 'q'], 0) {
             0 => start_browser(&avail_url),
-            1 => auto_install(&avail_url),
             _ => (),
         }
     }

@@ -39,9 +39,17 @@ Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](http
 1. open the Windows file exporer and navigate to `shell:startup`
 1. create shortcut to the geforcedrvchk3.exe
 
-### Attention
+### "Screenshot"
 
-Version 0.5 (and later versions) has a new feature: automatic driver download and installation. By default geforcedrvchk3 still uses the web browser to download the driver (started by pressing ENTER or by selecting 'D' from the options). The new addition is the option 'A', which tries to download the driver file to the %TEMP% and execute it. After the installation, temporarily downloaded driver package is deleted.
+```
+Display Driver Check version 0.5.0
+libcurl/8.6.0-DEV Schannel zlib/1.3.1
+
+Currently installed driver version: 551.86
+New driver version is available:    551.86
+
+Do you want to (d)ownload the latest driver, or (q)uit? (d,q)[d]
+```
 
 ## License
 
