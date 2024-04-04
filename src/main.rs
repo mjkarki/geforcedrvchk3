@@ -36,7 +36,7 @@ fn main() {
 
     println!("Currently installed driver version: {instd_ver}");
 
-    if instd_ver == avail_ver {
+    if instd_ver < avail_ver {
         println!("New driver version is available:    {avail_ver}\n");
         match ask_confirmation("Do you want to \
                                 (d)ownload the latest driver, or \
