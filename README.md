@@ -43,10 +43,8 @@ Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](http
 
 ```
 Display Driver Check version 0.5.0
-libcurl/8.6.0-DEV Schannel zlib/1.3.1
-
-Currently installed driver version: 551.86
-New driver version is available:    551.86
+Currently installed driver version: 123.45
+New driver version is available:    552.12
 
 Do you want to (d)ownload the latest driver, or (q)uit? (d,q)[d]
 ```
