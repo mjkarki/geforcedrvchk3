@@ -8,6 +8,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-curl = "0.4.46"
 json = "0.12.4"
 regex = "1.10.4"
+reqwest = { version = "0.12.3", features = ["blocking", "json"] }
+

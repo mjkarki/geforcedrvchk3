@@ -6,7 +6,6 @@ use geforcedrvchk3::{get_available_version_information,
                      VERSION,
                      SMI};
 use std::io::{stdin, stdout, Write};
-use curl::Version;
 
 fn handle_error<T>(result: Result<T, String>) -> T {
     let mut input = String::new();
@@ -25,7 +24,6 @@ fn handle_error<T>(result: Result<T, String>) -> T {
 
 fn main() {
     println!("Display Driver Check version {VERSION}");
-    println!("{}\n", Version::num());
 
     let installed: String = handle_error(get_installed_version(SMI));
     let available: (String, String) = handle_error(get_available_version_information(get_page));

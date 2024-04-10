@@ -11,8 +11,9 @@
 
 use std::{env, path::Path, path::PathBuf, process::Command};
 use regex::Regex;
-use curl::easy::Easy;
 use json;
+use reqwest::blocking;
+
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
 
@@ -25,21 +26,11 @@ const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/c
 ///
 /// If there is an error, then an error message is returned as a result.
 pub fn get_page(url: &str) -> Result<String, String> {
-    let mut handle = Easy::new();
-    let mut result_vector: Vec<u8> = Vec::new();
-
-    handle.url(url).unwrap();
-    {
-        let mut transfer = handle.transfer();
-        transfer.write_function(|data| {
-            result_vector.extend_from_slice(data);
-            Ok(data.len())
-        }).unwrap();
-        transfer.perform().or(Err("Unable to access the online resources!"))?;
+    let response = blocking::get(url);
+    match response {
+        Ok(resp) => resp.text().or(Err("The page has invalid UTF-8 characters!".to_string())),
+        Err(_) => Err("Unable to access the online resources!".to_string()),
     }
-
-    let result = String::from_utf8(result_vector).or(Err("The page has invalid UTF-8 characters!"))?;
-    Ok(result)
 }
 
 /// Retrieves the latest available driver installation package version number
