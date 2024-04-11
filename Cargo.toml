@@ -10,5 +10,5 @@ edition = "2021"
 [dependencies]
 json = "0.12.4"
 regex = "1.10.4"
-reqwest = { version = "0.12.3", features = ["blocking", "json"] }
+reqwest = { version = "0.12.3", features = ["blocking"] }
 
