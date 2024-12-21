@@ -7,7 +7,7 @@ use geforcedrvchk3::{get_available_version_information,
                      SMI};
 use std::io::{stdin, stdout, Write};
 
-fn handle_error<T>(result: Result<T, String>) -> T {
+fn handle_error<T>(result: Result<T, &'static str>) -> T {
     let mut input = String::new();
 
     match result {
@@ -28,8 +28,8 @@ fn main() {
     let installed: String = handle_error(get_installed_version(SMI));
     let available: (String, String) = handle_error(get_available_version_information(get_page));
 
-    let instd_ver: f64 = handle_error(installed.parse().or(Err("Cannot convert installed version number!".to_string())));
-    let avail_ver: f64 = handle_error(available.0.parse().or(Err("Cannot convert available version number!".to_string())));
+    let instd_ver: f64 = handle_error(installed.parse().or(Err("Cannot convert installed version number!")));
+    let avail_ver: f64 = handle_error(available.0.parse().or(Err("Cannot convert available version number!")));
     let avail_url: String = available.1;
 
     println!("Currently installed driver version: {instd_ver}");

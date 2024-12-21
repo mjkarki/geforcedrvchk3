@@ -17,7 +17,7 @@ use reqwest::blocking;
 use std::io::Write;             // Just for flush()
 use std::io::{stdin, stdout};
 
-pub const VERSION: &str = "0.5.0";
+pub const VERSION: &str = "0.5.1";
 pub const SMI: &str = r"nvidia-smi.exe";
 const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=101&pfid=859&osID=57&languageCode=1033&beta=0&isWHQL=0&dltype=-1&dch=1&upCRD=0&qnf=0&sort1=0&numberOfResults=10";
 
@@ -25,11 +25,11 @@ const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/c
 /// that the contents are UTF-8 encoded.
 ///
 /// If there is an error, then an error message is returned as a result.
-pub fn get_page(url: &str) -> Result<String, String> {
+pub fn get_page(url: &str) -> Result<String, &'static str> {
     let response = blocking::get(url);
     match response {
-        Ok(resp) => resp.text().or(Err("The page has invalid UTF-8 characters!".to_string())),
-        Err(_) => Err("Unable to access the online resources!".to_string()),
+        Ok(resp) => resp.text().or(Err("The page has invalid UTF-8 characters!")),
+        Err(_) => Err("Unable to access the online resources!"),
     }
 }
 
@@ -42,7 +42,7 @@ pub fn get_page(url: &str) -> Result<String, String> {
 ///
 /// If the information cannot be retrieved, then an error message is provided
 /// as a result.
-pub fn get_available_version_information(get_page: fn (&str) -> Result<String, String>) -> Result<(String, String), String> {
+pub fn get_available_version_information(get_page: fn (&str) -> Result<String, &'static str>) -> Result<(String, String), &'static str> {
     let page = get_page(NVIDIA_URL)?;
     let data = json::parse(&page).or(Err("Incorrect information at the online resource!"))?;
     let json_version = &data["IDS"][0]["downloadInfo"]["Version"];
@@ -58,7 +58,7 @@ pub fn get_available_version_information(get_page: fn (&str) -> Result<String, S
 ///
 /// If the version number is not available (e.g. nvidia-smi.exe could not be
 /// found), then an error message is provided as a result.
-pub fn get_installed_version(executable_name: &str) -> Result<String, String> {
+pub fn get_installed_version(executable_name: &str) -> Result<String, &'static str> {
     let nvidiasmi = get_nvidia_smi_location(&executable_name)?;
     let output = Command::new(nvidiasmi).output().or(Err("Couldn't detect installed version. Maybe the driver is not installed?"))?;
     let pattern = Regex::new(r"Driver Version: ([0-9]+\.[0-9]+)").unwrap();
@@ -68,7 +68,7 @@ pub fn get_installed_version(executable_name: &str) -> Result<String, String> {
 }
 
 /// Find nvidia-smi.exe and return full path.
-fn get_nvidia_smi_location(executable_name: &str) -> Result<String, String> {
+fn get_nvidia_smi_location(executable_name: &str) -> Result<String, &'static str> {
     let nvidia_smi_path_old: PathBuf = ["NVIDIA Corporation", "NVSMI", &executable_name].iter().collect();
     let nvidia_smi_path_new: PathBuf = ["System32", &executable_name].iter().collect();
     let mut nvidiasmi = PathBuf::new();
@@ -79,7 +79,7 @@ fn get_nvidia_smi_location(executable_name: &str) -> Result<String, String> {
         nvidiasmi.push(env::var("ProgramFiles").expect("Environment variable 'ProgramFiles' not found!"));
         nvidiasmi.extend(&nvidia_smi_path_old);
         if nvidiasmi.exists() == false {
-            Err("Couldn't detect location for nvidia-smi. Maybe the driver is not installed?".to_string())
+            Err("Couldn't detect location for nvidia-smi. Maybe the driver is not installed?")
         }
         else {
             Ok(String::from(nvidiasmi.to_string_lossy()))
@@ -194,7 +194,7 @@ mod tests {
     }
 
     /// Stub function for unit tests. Imitates get_page() function.
-    fn get_test_page(_url: &str) -> Result<String, String> {
+    fn get_test_page(_url: &str) -> Result<String, &'static str> {
         let json = r#"{ "Success" : "1", "IDS" : [ { "downloadInfo": { "Version" : "123.45", "DownloadURL" : "https://example.com/test.exe" } } ] }"#;
         Ok(json.to_string())
     }
