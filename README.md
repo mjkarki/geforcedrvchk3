@@ -31,7 +31,7 @@ Possible future goals:
 1. go to the project folder and run: `cargo build --release`
 1. fetch compiled binary from the target\release folder
 
-Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](https://github.com/mjkarki/geforcedrvchk3/releases/download/v0.5.0/geforcedrvchk3.exe) (at [github.com](https://github.com/mjkarki/geforcedrvchk3/releases))
+Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](https://github.com/mjkarki/geforcedrvchk3/releases/download/v0.5.1/geforcedrvchk3.exe) (at [github.com](https://github.com/mjkarki/geforcedrvchk3/releases))
 
 ### Installing
 
@@ -42,7 +42,7 @@ Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](http
 ### "Screenshot"
 
 ```
-Display Driver Check version 0.5.0
+Display Driver Check version 0.5.1
 Currently installed driver version: 123.45
 New driver version is available:    552.12
 
