@@ -17,9 +17,9 @@ use std::{env, path::Path, path::PathBuf, process::Command};
 use std::io::Write; // Just for flush()
 use std::io::{stdin, stdout};
 
-pub const VERSION: &str = "0.5.1";
+pub const VERSION: &str = "0.6.0";
 pub const SMI: &str = r"nvidia-smi.exe";
-const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=101&pfid=859&osID=57&languageCode=1033&beta=0&isWHQL=0&dltype=-1&dch=1&upCRD=0&qnf=0&sort1=0&numberOfResults=10";
+const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=131&pfid=1092&osID=57&languageCode=1033&isWHQL=0&beta=null&dltype=-1&dch=1&upCRD=null&qnf=0&ctk=null&sort1=0&numberOfResults=1";
 
 /// Fetches contents of the URL and returns them as a string. It is assumed
 /// that the contents are UTF-8 encoded.

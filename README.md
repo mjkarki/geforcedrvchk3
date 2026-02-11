@@ -4,7 +4,7 @@ GeForceDrvChk is a small no-nonsense application for automatically checking Gefo
 
 ## Introduction
 
-This little piece of code checks the GeForce website for new driver versions. It only checks for the International GeForce GTX series driver for 64-bit Windows desktop (so, no laptop version of the driver).
+This little piece of code checks the GeForce website for new driver versions. It only checks for the GeForce RTX series driver for 64-bit Windows desktop (so, no GTX or laptop version of the driver).
 
 The main point of the application is to prove myself that I'm able to implement everything required using only Rust. Of course, it also serves me as a replacement for GeForce Experience.
 
@@ -31,7 +31,7 @@ Possible future goals:
 1. go to the project folder and run: `cargo build --release`
 1. fetch compiled binary from the target\release folder
 
-Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](https://github.com/mjkarki/geforcedrvchk3/releases/download/v0.5.1/geforcedrvchk3.exe) (at [github.com](https://github.com/mjkarki/geforcedrvchk3/releases))
+Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](https://github.com/mjkarki/geforcedrvchk3/releases/download/v0.6.0/geforcedrvchk3.exe) (at [github.com](https://github.com/mjkarki/geforcedrvchk3/releases))
 
 ### Installing
 
@@ -42,7 +42,7 @@ Alternatively download the pre-built binary from here: [geforcedrvchk3.exe](http
 ### "Screenshot"
 
 ```
-Display Driver Check version 0.5.1
+Display Driver Check version 0.6.0
 Currently installed driver version: 123.45
 New driver version is available:    552.12
 
