@@ -17,7 +17,7 @@ use std::{env, path::Path, path::PathBuf, process::Command};
 use std::io::Write; // Just for flush()
 use std::io::{stdin, stdout};
 
-pub const VERSION: &str = "0.6.0";
+pub const VERSION: &str = "0.6.1";
 pub const SMI: &str = r"nvidia-smi.exe";
 const NVIDIA_URL: &str = r"https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php?func=DriverManualLookup&psid=131&pfid=1092&osID=57&languageCode=1033&isWHQL=0&beta=null&dltype=-1&dch=1&upCRD=null&qnf=0&ctk=null&sort1=0&numberOfResults=1";
 
